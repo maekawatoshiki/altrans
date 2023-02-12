@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 altius-core = { git = "https://github.com/maekawatoshiki/altius" }
 altius-session = { git = "https://github.com/maekawatoshiki/altius", features = ["blis"] }
+dirs = "4.0.0"
 tokenizers = "^0.13.2"
 
 [profile.dev]

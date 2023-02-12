@@ -24,3 +24,5 @@ download() {
 download 1Ib96I4bfgT5Bb3TyWnge7XaMhaqjXX4M ./fugumt.zip
 unzip fugumt.zip
 rm fugumt.zip
+mkdir -p ~/.cache/altrans
+mv fugumt ~/.cache/altrans/fugumt

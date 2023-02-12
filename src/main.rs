@@ -2,12 +2,14 @@ use std::io::Write;
 
 use altius_core::{onnx::load_onnx, tensor::Tensor};
 use altius_session::interpreter::InterpreterSessionBuilder;
+use dirs;
 use tokenizers::Tokenizer;
 
 fn main() {
-    let tokenizer = Tokenizer::from_file("fugumt/target-tokenizer.json").unwrap();
+    let cache_dir = dirs::home_dir().unwrap().join(".cache/altrans");
+    let tokenizer = Tokenizer::from_file(cache_dir.join("fugumt/target-tokenizer.json")).unwrap();
 
-    let encoder = load_onnx("./fugumt/encoder_model.onnx").unwrap();
+    let encoder = load_onnx(cache_dir.join("fugumt/encoder_model.onnx")).unwrap();
     let encoder_input_ids = encoder.lookup_named_value("input_ids").unwrap();
     let encoder_attention_mask = encoder.lookup_named_value("attention_mask").unwrap();
     let encoder = InterpreterSessionBuilder::new(&encoder)
@@ -15,7 +17,7 @@ fn main() {
         .build()
         .unwrap();
 
-    let decoder = load_onnx("./fugumt/decoder_model.onnx").unwrap();
+    let decoder = load_onnx(cache_dir.join("fugumt/decoder_model.onnx")).unwrap();
     let decoder_encoder_attention_mask = decoder
         .lookup_named_value("encoder_attention_mask")
         .unwrap();
@@ -82,13 +84,11 @@ fn main() {
                 ])
                 .unwrap()
                 .remove(0);
-            // println!("{}", logits);
             let mut indices = (0..logits.dims()[2]).collect::<Vec<_>>();
-            // let idx = 0;
             let logits = logits.slice_at::<f32>(&[0, idx]);
             indices.sort_by(|&a, &b| logits[b].partial_cmp(&logits[a]).unwrap());
-            // println!("{:?}", &indices[0..5]);
             let mut next_token = 0i64;
+
             for i in indices {
                 if i == 32000 {
                     // pad
@@ -106,19 +106,17 @@ fn main() {
                 break;
             }
             decoder_input_ids_vec.push(next_token);
-            print!(
-                "{}\r",
-                tokenizer
-                    .decode(
-                        decoder_input_ids_vec
-                            .clone()
-                            .into_iter()
-                            .map(|x| x as u32)
-                            .collect(),
-                        true
-                    )
-                    .unwrap()
-            );
+            let translation = tokenizer
+                .decode(
+                    decoder_input_ids_vec
+                        .clone()
+                        .into_iter()
+                        .map(|x| x as u32)
+                        .collect(),
+                    true,
+                )
+                .unwrap();
+            print!("{}\r", translation);
             std::io::stdout().flush().unwrap();
         }
         println!()
