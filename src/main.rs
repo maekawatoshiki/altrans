@@ -76,10 +76,7 @@ fn main() {
                         let mut input_ids = vec![0i64; 100];
                         input_ids[0..decoder_input_ids_vec.len()]
                             .copy_from_slice(decoder_input_ids_vec.as_slice());
-                        Tensor::new(
-                            vec![1, 100].into(),
-                            input_ids.into_iter().map(|x| x as i64).collect::<Vec<_>>(),
-                        )
+                        Tensor::new(vec![1, 100].into(), input_ids)
                     }),
                     (decoder_encoder_hidden_states, last_hidden_state.clone()),
                 ])
@@ -97,10 +94,10 @@ fn main() {
                     // pad
                     continue;
                 }
-                if i == 2 {
-                    // space
-                    continue;
-                }
+                // if i == 2 {
+                //     // space
+                //     continue;
+                // }
                 next_token = i as i64;
                 break;
             }
@@ -110,8 +107,17 @@ fn main() {
             }
             decoder_input_ids_vec.push(next_token);
             print!(
-                "{}",
-                tokenizer.decode(vec![next_token as u32], true).unwrap()
+                "{}\r",
+                tokenizer
+                    .decode(
+                        decoder_input_ids_vec
+                            .clone()
+                            .into_iter()
+                            .map(|x| x as u32)
+                            .collect(),
+                        true
+                    )
+                    .unwrap()
             );
             std::io::stdout().flush().unwrap();
         }
