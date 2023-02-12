@@ -37,7 +37,6 @@ fn main() {
 
         let encoder_attention_mask_tensor = {
             let mut attn_mask = vec![0i64; 100];
-            println!("{}", encoding.get_ids().len());
             for i in 0..encoding.get_ids().len() + /*</s> = */1 {
                 attn_mask[i] = 1;
             }

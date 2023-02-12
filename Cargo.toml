@@ -1,15 +1,12 @@
 [package]
-name = "translation-demo"
+name = "altrans"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 altius-core = { git = "https://github.com/maekawatoshiki/altius" }
 altius-session = { git = "https://github.com/maekawatoshiki/altius", features = ["blis"] }
 tokenizers = "^0.13.2"
-# sentencepiece = "0.10.0"
 
 [profile.dev]
 opt-level = 3
